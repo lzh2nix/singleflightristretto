@@ -11,12 +11,7 @@ import (
 
 // A Getter loads data for a key.
 type Getter interface {
-	// Get returns the value identified by key, populating dest.
-	//
-	// The returned data must be unversioned. That is, key must
-	// uniquely describe the loaded data, without an implicit
-	// current time, and without relying on cache expiration
-	// mechanisms.
+	// return value, cost, TTL for given key
 	Get(ctx context.Context, key string) (interface{}, int64, time.Duration, error)
 }
 
@@ -33,9 +28,9 @@ type Config struct {
 }
 
 type Cache struct {
-	ristretto *ristretto.Cache
-	getter    Getter
-	sg        *singleflight.Group
+	ristretto *ristretto.Cache    // backend cache
+	getter    Getter              // get function, load data when miss
+	sg        *singleflight.Group // singleflight for load
 }
 
 // just ristretto cache
